@@ -49,15 +49,16 @@ function createTable() {
 			<thead class="thead-dark">
 				<tr>
 					<th class="align-middle" style='width: 20%; text-align: center;'>召喚獸</th>
-					${craft_mode_type_string.map((str, index) => '<th style=\'width: 8%; text-align: center;\'><img src=\'../tos_tool_data/img/craft/'+craftTypeImg[index]+'.png\' width=\'50px\'\></th>').join('')}
+					${craft_mode_type_string.map((str, index) => '<th style=\'width: 8%; text-align: center;\' onClick=\'selectWholeColumn("'+str+'", '+JSON.stringify(craftDataByName)+')\'><img src=\'../tos_tool_data/img/craft/'+craftTypeImg[index]+'.png\' width=\'50px\'\></th>').join('')}
 				</tr>
 			</thead>
 			<tbody>
 				${
 					Object.keys(craftDataByName).map(craft => {
+						const allTypeCraft = Object.keys(craftDataByName[craft]).filter(c => c!=='monster').map(c => craftDataByName[craft][c])
 						return `
 							<tr>
-								<td class="align-middle">
+								<td class="align-middle" onClick='selectWholeRow(`+JSON.stringify(allTypeCraft)+`)'>
 									${
 										craftDataByName[craft]?.monster ? craftDataByName[craft]?.monster?.map(monster => {
 											return `<img src='../tos_tool_data/img/monster/${monster}.png' width='50px'\>`
@@ -69,9 +70,10 @@ function createTable() {
 								${
 									craft_mode_type_string.map(type => {
 										const craftName = armed_craft_data.find(c => c.id === craftDataByName[craft][type])?.name
+										const errorTypeId = craftTypeImg[craft_mode_type_string.findIndex(t => t === type)]
 										return craftDataByName?.[craft]?.[type] ? `
-											<td class="align-middle craft-td" style="text-align: center;" onClick='onClickCraft(${craftDataByName[craft][type]})'>
-												${`<img title='${craftName}' alt='${craftDataByName[craft][type]}' src='../tos_tool_data/img/craft/${craftDataByName[craft][type]}.png' width='50px' onClick='onClickCraft(${craftDataByName[craft][type]})'\>`}
+											<td class="align-middle craft-td" id="craft-${craftDataByName[craft][type]}" style="text-align: center;" onClick='onClickCraft(${craftDataByName[craft][type]})'>
+												${`<img title='${craftName}' alt='${craftDataByName[craft][type]}' src='../tos_tool_data/img/craft/${craftDataByName[craft][type]}.png' onerror='this.src="../tos_tool_data/img/craft/${errorTypeId}.png"' width='50px' onClick='onClickCraft(${craftDataByName[craft][type]})'\>`}
 											</td>
 										` : '<td></td>'
 									}).join('')
@@ -84,7 +86,6 @@ function createTable() {
 			</tbody>
 		</table>
 	`
-	console.log(craftDataByName)
 	$('.armed-craft-row').html(tableHtml)
 	
 }
@@ -95,18 +96,26 @@ function getPureName(name) {
 
 function onClickCraft(id) {
 	event.stopPropagation()
-	currentNode = event.target.tagName.toLowerCase() === 'img' ? event.target.parentNode : event.target
+	const craftTd = $('#craft-'+id).get(0)
+	
 	if(chosenCraft.has(id)) {
 		chosenCraft.delete(id)
-		currentNode.style.backgroundColor = 'transparent'
-		currentNode.style.boxShadow = 'none'
+		craftTd.style.backgroundColor = 'transparent'
+		craftTd.style.boxShadow = 'none'
 	}
 	else {
 		chosenCraft.add(id)
-		currentNode.style.backgroundColor = '#27B821'
-		currentNode.style.boxShadow = 'inset 2px 2px green, inset -2px -2px green'
+		craftTd.style.backgroundColor = '#27B821'
+		craftTd.style.boxShadow = 'inset 2px 2px green, inset -2px -2px green'
 	}
-	console.log(chosenCraft)
+}
+
+function selectWholeRow(allCraft) {
+	allCraft.forEach(craft => onClickCraft(craft))
+}
+
+function selectWholeColumn(type, data) {
+	Object.keys(data).filter(name => data[name][type]).map(name => data[name][type]).forEach(craft => onClickCraft(craft))
 }
 
 function resetChosen() {
