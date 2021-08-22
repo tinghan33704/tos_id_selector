@@ -2,8 +2,40 @@ const tool_id = 'id_selector';
 
 let chosenCraft = new Set()
 
+let thInitPosition = {top: 0, left: 0}
+
+$(window).resize(() => {
+    $('.side_navigation').css(
+        {
+            top: (parseInt($('#top-bar').css('height'))-20)+'px',
+			left: thInitPosition.left+'px'
+        }
+    );
+	
+	thInitPosition.top = $('#craft-table')[0].offsetTop
+	thInitPosition.left = $('#craft-table')[0].offsetLeft
+	
+	$('.sticky-header').css(
+		{
+			width: (parseFloat($('#craft-table').width()))+'px',
+			top: thInitPosition.top+'px',
+			left: thInitPosition.left+1+'px'
+		}
+	)
+	
+	$('.monster-th').css(
+		{
+			width: (parseFloat($('.monster-td').outerWidth()))+'px',
+		}
+	)
+	$('.craft-th').css(
+		{
+			width: (parseFloat($('.craft-td').outerWidth()))+'px',
+		}
+	)
+});
+
 $(document).ready(function(){
-    createTable();
 	chosenCraft.clear()
 	$("#craft_id_string").on("click", craftString);
 	$("#reset_chosen").on("click", resetChosen);
@@ -14,16 +46,71 @@ $(document).ready(function(){
             scrollTop: 0
         }, 300);
     });
+	
+    createTable();
+	
+	$('.sticky-header').css(
+		{
+			width: (parseFloat($('#craft-table').width()))+'px'
+		}
+	)
+	
+	$('.monster-th').css(
+		{
+			width: (parseFloat($('.monster-td').outerWidth()))+'px',
+		}
+	)
+	$('.craft-th').css(
+		{
+			width: (parseFloat($('.craft-td').outerWidth()))+'px',
+		}
+	)
+	
+	thInitPosition.top = $('#craft-table')[0].offsetTop
+	thInitPosition.left = $('#craft-table')[0].offsetLeft
     
     $(window).scroll(() => {
         if ($(this).scrollTop() > 300) $('#toTop-btn').fadeIn(200);
         else $('#toTop-btn').stop().fadeOut(200);
-    }).scroll();
+		
+		// fixed header
+		if ($(this).scrollTop() > $('#top-bar').height() && $(this).scrollTop() < $('#craft-table')[0].offsetHeight) {
+			$('.sticky-header').css(
+				{
+					top: $('#top-bar').height() + 'px',
+				}
+			)
+		}
+		else {
+			if($('.sticky-header').css('top') !== thInitPosition.top - $(this).scrollTop() +'px') {
+				$('.sticky-header').css(
+					{
+						top: thInitPosition.top - $(this).scrollTop() +'px',
+					}
+				)
+			}
+		}
+    });
+	
+	$("#craft-table").on('scroll', function(){
+		$('.sticky-header').css(
+			{
+				left: thInitPosition.left - (parseInt($('#craft-table')[0].scrollLeft)) + 1 +'px'
+			}
+		)
+	});
 });
 
 $(window).resize(function(){
     $('.side_navigation').css({top: (parseInt($('#top-bar').css('height'))-20)+'px'});
 });
+
+function clickCell(field, value, row, $element) {
+	const craftType = craft_mode_type_string[parseInt(field.replace('craft-', ''))]
+	const craftId = row?.['row-data']?.[craftType] ?? -1
+	
+	onClickCraft(craftId)
+}
 
 function createTable() {
 	const craftPureName = new Set()
@@ -42,26 +129,42 @@ function createTable() {
 		craftPureName.add(getPureName(craft.name))
 		craftDataByName[getPureName(craft.name)][craft.mode] = craft.id
 	})
-	const craftTypeImg = [1, 2, 3, 35, 58, 75, 112, 171, 246, 329]
 	
+	const craftTypeImg = [1, 2, 3, 35, 58, 75, 112, 171, 246, 329]
 	let tableHtml = `
-		<table class="table table-bordered table-responsive">
-			<thead class="thead-dark">
+		<table class="table table-bordered table-responsive" id="craft-table">
+			<thead class="thead-dark sticky-header">
 				<tr>
-					<th class="align-middle" style='width: 20%; text-align: center;'>召喚獸</th>
-					${craft_mode_type_string.map((str, index) => '<th style=\'width: 8%; text-align: center;\' onClick=\'selectWholeColumn("'+str+'", '+JSON.stringify(craftDataByName)+')\'><img src=\'../tos_tool_data/img/craft/'+craftTypeImg[index]+'.png\' width=\'50px\'\></th>').join('')}
+					<th class="align-middle monster-th">
+						<img \>
+					</th>
+					${craft_mode_type_string.map((str, index) => `
+						<th class="craft-th" onClick='selectWholeColumn("${str}", ${JSON.stringify(craftDataByName)})'>
+							<img src='../tos_tool_data/img/craft/${craftTypeImg[index]}.png' \>
+							<div class="monsterId">
+								${`${str.slice(-2)}`}
+							</div>
+						</th>
+					`).join('')}
 				</tr>
 			</thead>
-			<tbody>
+			<tbody id="craft-table-body">
+				<!-- empty row -->
+				<tr>
+					<td class="monster-td">
+						<img height='80px'/>
+					</td>
+				</tr>
+				<!-- -->
 				${
 					Object.keys(craftDataByName).map(craft => {
 						const allTypeCraft = Object.keys(craftDataByName[craft]).filter(c => c!=='monster').map(c => craftDataByName[craft][c])
 						return `
 							<tr>
-								<td class="align-middle" onClick='selectWholeRow(`+JSON.stringify(allTypeCraft)+`)'>
+								<td class="align-middle monster-td" onClick='selectWholeRow(`+JSON.stringify(allTypeCraft)+`)'>
 									${
 										craftDataByName[craft]?.monster ? craftDataByName[craft]?.monster?.map(monster => {
-											return `<img src='../tos_tool_data/img/monster/${monster}.png' width='50px'\>`
+											return `<img src='../tos_tool_data/img/monster/${monster}.png'\>`
 										}).join('')
 										: ``
 										
@@ -72,10 +175,13 @@ function createTable() {
 										const craftName = armed_craft_data.find(c => c.id === craftDataByName[craft][type])?.name
 										const errorTypeId = craftTypeImg[craft_mode_type_string.findIndex(t => t === type)]
 										return craftDataByName?.[craft]?.[type] ? `
-											<td class="align-middle craft-td" id="craft-${craftDataByName[craft][type]}" style="text-align: center;" onClick='onClickCraft(${craftDataByName[craft][type]})'>
-												${`<img title='${craftName}' alt='${craftDataByName[craft][type]}' src='../tos_tool_data/img/craft/${craftDataByName[craft][type]}.png' onerror='this.src="../tos_tool_data/img/craft/${errorTypeId}.png"' width='50px' onClick='onClickCraft(${craftDataByName[craft][type]})'\>`}
+											<td class="align-middle craft-td" id="craft-${craftDataByName[craft][type]}" onClick='onClickCraft(${craftDataByName[craft][type]})'>
+												${`<img title='${craftName}' alt='${craftDataByName[craft][type]}' src='../tos_tool_data/img/craft/${craftDataByName[craft][type]}.png' onerror='this.src="../tos_tool_data/img/craft/${errorTypeId}.png"' onClick='onClickCraft(${craftDataByName[craft][type]})'\>`}
+												<div class="monsterId">
+													${paddingZeros(craftDataByName[craft][type], 3)}
+												</div>
 											</td>
-										` : '<td></td>'
+										` : '<td class="craft-td"><img \></td>'
 									}).join('')
 								}
 							</tr>

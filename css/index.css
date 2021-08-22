@@ -1,3 +1,30 @@
+thead {
+	position: fixed;
+}
+
+thead > tr {
+	width: 100%;
+}
+
+.monster-th, .monster-td {
+	width: 20%;
+	text-align: center;
+}
+
+.monster-th img, .monster-td img, .craft-th img, .craft-td img {
+	width: 60px;
+}
+
+.monster-td {
+	background-color: rgba(52, 58, 64, 0.5);
+	border-color: rgba(52, 58, 64, 0.5) !important;
+}
+
+.craft-th, .craft-td {
+	width: 8%;
+	text-align: center;
+}
+
 #result-row {
 	background-color: #ECFFFF;
 	border: 2px #0080FF solid;
@@ -5,4 +32,5 @@
 	font-size: 1.5em;
 	color: #000079;
 	border-radius: 20px;
+	margin-top: 10px;
 }
