@@ -1,6 +1,8 @@
 const tool_id = 'id_selector';
 
 let chosenCraft = new Set()
+const craftPureName = new Set()
+const craftDataByName = {}
 
 let thInitPosition = {top: 0, left: 0}
 
@@ -47,6 +49,7 @@ $(document).ready(function(){
         }, 300);
     });
 	
+	createData();
     createTable();
 	
 	$('.sticky-header').css(
@@ -99,6 +102,8 @@ $(document).ready(function(){
 			}
 		)
 	});
+	
+	$(".result-row").on('click', copyToClipboard)
 });
 
 $(window).resize(function(){
@@ -112,10 +117,7 @@ function clickCell(field, value, row, $element) {
 	onClickCraft(craftId)
 }
 
-function createTable() {
-	const craftPureName = new Set()
-	const craftDataByName = {}
-	
+function createData() {
 	armed_craft_data.forEach(craft => {
 		const pureName = getPureName(craft.name)
 		if(!craftDataByName[pureName]) {
@@ -129,7 +131,9 @@ function createTable() {
 		craftPureName.add(getPureName(craft.name))
 		craftDataByName[getPureName(craft.name)][craft.mode] = craft.id
 	})
-	
+}
+
+function createTable() {
 	const craftTypeImg = [1, 2, 3, 35, 58, 75, 112, 171, 246, 329]
 	let tableHtml = `
 		<table class="table table-bordered table-responsive" id="craft-table">
@@ -139,7 +143,7 @@ function createTable() {
 						<img \>
 					</th>
 					${craft_mode_type_string.map((str, index) => `
-						<th class="craft-th" onClick='selectWholeColumn("${str}", ${JSON.stringify(craftDataByName)})'>
+						<th class="craft-th" onClick='selectWholeColumn("${str}")'>
 							<img src='../tos_tool_data/img/craft/${craftTypeImg[index]}.png' \>
 							<div class="monsterId">
 								${`${str.slice(-2)}`}
@@ -158,10 +162,9 @@ function createTable() {
 				<!-- -->
 				${
 					Object.keys(craftDataByName).map(craft => {
-						const allTypeCraft = Object.keys(craftDataByName[craft]).filter(c => c!=='monster').map(c => craftDataByName[craft][c])
 						return `
 							<tr>
-								<td class="align-middle monster-td" onClick='selectWholeRow(`+JSON.stringify(allTypeCraft)+`)'>
+								<td class="align-middle monster-td" onClick='selectWholeRow("${craft}")'>
 									${
 										craftDataByName[craft]?.monster ? craftDataByName[craft]?.monster?.map(monster => {
 											return `<img src='../tos_tool_data/img/monster/${monster}.png'\>`
@@ -216,12 +219,12 @@ function onClickCraft(id) {
 	}
 }
 
-function selectWholeRow(allCraft) {
-	allCraft.forEach(craft => onClickCraft(craft))
+function selectWholeRow(craftName) {
+	Object.keys(craftDataByName[craftName]).filter(c => c!=='monster').map(c => craftDataByName[craftName][c]).forEach(craft => onClickCraft(craft))
 }
 
-function selectWholeColumn(type, data) {
-	Object.keys(data).filter(name => data[name][type]).map(name => data[name][type]).forEach(craft => onClickCraft(craft))
+function selectWholeColumn(type) {
+	Object.keys(craftDataByName).filter(name => craftDataByName[name][type]).map(name => craftDataByName[name][type]).forEach(craft => onClickCraft(craft))
 }
 
 function resetChosen() {
@@ -231,11 +234,26 @@ function resetChosen() {
 
 function craftString() {
 	if([...chosenCraft].length === 0) {
-		alert('請先選擇龍刻')
+		errorAlert(8)
 		return 
 	}
 	
 	$("#result-row").html([...chosenCraft].sort().join(' '))
 	$(".result-row").css({'display': 'block'})
     jumpTo("result_title");
+}
+
+function copyToClipboard(e) {
+	$("#result-row").select()
+	e.preventDefault();
+
+	var copyText = $("#result-row").html()
+
+	var textarea = document.createElement("textarea")
+	textarea.textContent = copyText
+	textarea.style.position = "fixed"
+	document.body.appendChild(textarea)
+	textarea.select()
+	document.execCommand("copy")
+	document.body.removeChild(textarea)
 }
