@@ -238,6 +238,8 @@ function craftString() {
 		return 
 	}
 	
+	$("#result-row").css({'background-color': '#ecffff', 'border-color': '#0080ff'})
+	$("#note-row").html('<i class="fa fa-lightbulb-o"></i>&nbsp;點擊區塊可直接複製完整字串')
 	$("#result-row").html([...chosenCraft].sort().join(' '))
 	$(".result-row").css({'display': 'block'})
     jumpTo("result_title");
@@ -256,4 +258,7 @@ function copyToClipboard(e) {
 	textarea.select()
 	document.execCommand("copy")
 	document.body.removeChild(textarea)
+	
+	$("#result-row").css({'background-color': '#e2ffe9', 'border-color': '#5bd876'})
+	$("#note-row").html('<i class="fa fa-check"></i>&nbsp;複製成功')
 }
