@@ -17,7 +17,7 @@ thead > tr {
 
 .monster-td {
 	background-color: rgba(52, 58, 64, 0.5);
-	border-color: rgba(52, 58, 64, 0.5) !important;
+	border-color: var(--table_border) !important;
 }
 
 .craft-th, .craft-td {
@@ -25,8 +25,18 @@ thead > tr {
 	text-align: center;
 }
 
-#result-row {
-	background-color: #ECFFFF;
+.craft-td {
+	background-color: transparent;
+	box-shadow: none;
+}
+
+.craft-td-selected {
+	background-color: var(--table_td_selected_background);
+	box-shadow: inset 2px 2px green, inset -2px -2px green;
+}
+
+.result-panel {
+	background-color: var(--div_selector_result_background);
 	border: 2px #0080FF solid;
 	padding: 20px;
 	font-size: 1.5em;
@@ -36,9 +46,20 @@ thead > tr {
 	cursor: pointer;
 }
 
-#note-row {
+.result-panel-copied {
+	background-color: var(--div_selector_result_success_background);
+	border: 2px #5bd876 solid;
+	padding: 20px;
 	font-size: 1.5em;
-	color: #555555;
+	color: #000079;
+	border-radius: 20px;
+	margin-top: 10px;
+	cursor: pointer;
+}
+
+.note-row {
+	font-size: 1.5em;
+	color: var(--text_color);
 	text-align: center;
 	padding: 10px;
 }

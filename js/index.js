@@ -3,6 +3,7 @@ const tool_id = 'id_selector';
 let chosenCraft = new Set()
 const craftPureName = new Set()
 const craftDataByName = {}
+let theme = 'normal';
 
 let thInitPosition = {top: 0, left: 0}
 
@@ -38,6 +39,8 @@ $(window).resize(() => {
 });
 
 $(document).ready(function(){
+	init()
+	
 	chosenCraft.clear()
 	$("#craft_id_string").on("click", craftString);
 	$("#reset_chosen").on("click", resetChosen);
@@ -209,13 +212,11 @@ function onClickCraft(id) {
 	
 	if(chosenCraft.has(id)) {
 		chosenCraft.delete(id)
-		craftTd.style.backgroundColor = 'transparent'
-		craftTd.style.boxShadow = 'none'
+		$('#craft-'+id).removeClass('craft-td-selected')
 	}
 	else {
 		chosenCraft.add(id)
-		craftTd.style.backgroundColor = '#27B821'
-		craftTd.style.boxShadow = 'inset 2px 2px green, inset -2px -2px green'
+		$('#craft-'+id).addClass('craft-td-selected')
 	}
 }
 
@@ -229,7 +230,7 @@ function selectWholeColumn(type) {
 
 function resetChosen() {
 	chosenCraft.clear()
-	$('.craft-td').css({'background-color': 'transparent', 'box-shadow': 'none'})
+	$('.craft-td').removeClass('craft-td-selected')
 }
 
 function craftString() {
@@ -238,18 +239,18 @@ function craftString() {
 		return 
 	}
 	
-	$("#result-row").css({'background-color': '#ecffff', 'border-color': '#0080ff'})
+	$(".result-panel").removeClass('result-panel-copied')
 	$("#note-row").html('<i class="fa fa-lightbulb-o"></i>&nbsp;點擊區塊可直接複製完整字串')
-	$("#result-row").html([...chosenCraft].sort().join(' '))
+	$("#result-panel").html([...chosenCraft].sort().join(' '))
 	$(".result-row").css({'display': 'block'})
     jumpTo("result_title");
 }
 
 function copyToClipboard(e) {
-	$("#result-row").select()
+	$("#result-panel").select()
 	e.preventDefault();
 
-	var copyText = $("#result-row").html()
+	var copyText = $("#result-panel").html()
 
 	var textarea = document.createElement("textarea")
 	textarea.textContent = copyText
@@ -259,6 +260,6 @@ function copyToClipboard(e) {
 	document.execCommand("copy")
 	document.body.removeChild(textarea)
 	
-	$("#result-row").css({'background-color': '#e2ffe9', 'border-color': '#5bd876'})
+	$(".result-panel").addClass('result-panel-copied')
 	$("#note-row").html('<i class="fa fa-check"></i>&nbsp;複製成功')
 }

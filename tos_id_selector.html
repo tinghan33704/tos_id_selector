@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<!-- Last modified : 2021.08.23 23:05 -->
+<!-- Last modified : 2021.08.24 00:21 -->
 <head>
     <title>神魔之塔武裝龍刻編號生成器</title>
     <meta charset="utf-8">
@@ -70,19 +70,19 @@
                 <h2>生成編號</h2>
             </div>
             <div class="col-12">
-                <div id="result-row"></div>
+                <div class="result-panel" id="result-panel"></div>
             </div>
             <div class="col-12">
-                <div id="note-row">
-                    <i class="fa fa-lightbulb-o"></i>
-					&nbsp;點擊區塊可直接複製完整字串
-				</div>
+                <div class="note-row" id="note-row"></div>
             </div>
         </div>
         <div class="row my-5"></div>
         <div class="copyright"></div>
     </div>
-    
+	
+    <button type="button" id="changeTheme-btn" class="changeTheme">
+        <i class="fa fa-adjust"></i>
+    </button>
     <button type="button" id="toTop-btn" class="toTop"></button>
 </body>
 </html>
