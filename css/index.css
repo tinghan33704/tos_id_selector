@@ -9,6 +9,7 @@ thead > tr {
 .monster-th, .monster-td {
 	width: 20%;
 	text-align: center;
+	cursor: pointer;
 }
 
 .monster-th img, .monster-td img, .craft-th img, .craft-td img {
@@ -23,6 +24,7 @@ thead > tr {
 .craft-th, .craft-td {
 	width: 8%;
 	text-align: center;
+	cursor: pointer;
 }
 
 .craft-td {
@@ -62,4 +64,8 @@ thead > tr {
 	color: var(--text_color);
 	text-align: center;
 	padding: 10px;
+}
+
+.data-textarea {
+	height: 200px !important;
 }

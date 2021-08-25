@@ -208,6 +208,12 @@ function getPureName(name) {
 
 function onClickCraft(id) {
 	event.stopPropagation()
+	selectCraft(id)
+}
+
+function selectCraft(id) {
+	if(!$('#craft-'+id).length) return
+	
 	const craftTd = $('#craft-'+id).get(0)
 	
 	if(chosenCraft.has(id)) {
@@ -262,4 +268,51 @@ function copyToClipboard(e) {
 	
 	$(".result-panel").addClass('result-panel-copied')
 	$("#note-row").html('<i class="fa fa-check"></i>&nbsp;複製成功')
+}
+
+function openDataInputPanel() {
+    $('#inputPanel').modal('show')
+    renderDataInputPanel()
+}
+
+function renderDataInputPanel() {
+    let render_str = "";
+	render_str += `
+	<div class='row data-input-row'>
+		<div class='col-12 col-md-12 col-lg-12 data-input-tab'>
+			<div class='col-12 col-md-12 col-lg-12 option-text'>匯入編號</div>
+			<div class='col-12 col-md-12 col-lg-12 btn-shell'>
+				<textarea type='text' class='form-control data-textarea' id='data-textarea' placeholder='輸入編號字串' onkeypress='return (event.charCode !=8 && event.charCode == 0 || event.charCode == 32 || (event.charCode >= 48 && event.charCode <= 57))'></textarea>
+			</div>
+			<div class='col-12 col-md-12 col-lg-12 btn-shell'>
+				<div>
+					<button class='btn btn-success btn-block uid-btn' id='update-confirm-uid' onclick='getInputData()'>
+						匯入
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	`
+
+    $("#inputPanel .modal-body").html(render_str)
+}
+
+function isValidInputString(str) {
+	// only accept number and space
+	return /^(?=.*\d\s)[\d\s]+$/.test(str)
+}
+
+function getInputData() {
+	const dataString = $('#data-textarea').val()
+	
+	if(!isValidInputString(dataString)) {
+		errorAlert(9)
+		return
+	}
+	
+	resetChosen()
+	const dataArray = [...new Set(dataString.split(/\s+/).filter(str => str.length > 0).map(str => parseInt(str)))]
+	dataArray.forEach(id => selectCraft(id))
+	$('#inputPanel').modal('hide')
 }
