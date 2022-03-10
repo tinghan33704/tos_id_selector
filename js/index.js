@@ -131,9 +131,18 @@ function createData() {
 			craftDataByName[pureName].monster = craft.monster
 		}
 		
+		if(!craftDataByName[pureName]?.attribute) {
+			craftDataByName[pureName].attribute = craft.attribute
+		}
+		
+		if(!craftDataByName[pureName]?.race) {
+			craftDataByName[pureName].race = craft.race
+		}
+		
 		craftPureName.add(getPureName(craft.name))
 		craftDataByName[getPureName(craft.name)][craft.mode] = craft.id
 	})
+	console.log(craftDataByName)
 }
 
 function createTable() {
@@ -172,7 +181,9 @@ function createTable() {
 										craftDataByName[craft]?.monster ? craftDataByName[craft]?.monster?.map(monster => {
 											return `<img src='../tos_tool_data/img/monster/${monster}.png'\>`
 										}).join('')
-										: ``
+										: (craftDataByName[craft]?.attribute || craftDataByName[craft]?.race) ? 
+											`${craftDataByName[craft]?.attribute && craftDataByName[craft]?.attribute !== '沒有限制' ? `<img src='../tos_tool_data/img/monster/icon_${attr_zh_to_en[craftDataByName[craft]?.attribute]}.png'\>` : ''}${craftDataByName[craft]?.race && craftDataByName[craft]?.race !== '沒有限制' ? `<img src='../tos_tool_data/img/monster/icon_${race_zh_to_en[craftDataByName[craft]?.race]}.png'\>` : ''}`
+										:``
 										
 									}
 								</td>
