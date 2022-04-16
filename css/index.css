@@ -6,6 +6,15 @@ thead > tr {
 	width: 100%;
 }
 
+.row {
+	justify-content: center;
+}
+
+.btn-shell {
+	margin: 5px;
+	padding: 0;
+}
+
 .monster-th, .monster-td {
 	width: 20%;
 	text-align: center;
