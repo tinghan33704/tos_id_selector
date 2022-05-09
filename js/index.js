@@ -139,6 +139,10 @@ function createData() {
 			craftDataByName[pureName].race = craft.race
 		}
 		
+		if(!craftDataByName[pureName]?.series) {
+			craftDataByName[pureName].series = craft.series
+		}
+		
 		craftPureName.add(getPureName(craft.name))
 		craftDataByName[getPureName(craft.name)][craft.mode] = craft.id
 	})
@@ -183,7 +187,18 @@ function createTable() {
 										}).join('')
 										: (craftDataByName[craft]?.attribute || craftDataByName[craft]?.race) ? 
 											`${craftDataByName[craft]?.attribute && craftDataByName[craft]?.attribute !== '沒有限制' ? `<img src='../tos_tool_data/img/monster/icon_${attr_zh_to_en[craftDataByName[craft]?.attribute]}.png'\>` : ''}${craftDataByName[craft]?.race && craftDataByName[craft]?.race !== '沒有限制' ? `<img src='../tos_tool_data/img/monster/icon_${race_zh_to_en[craftDataByName[craft]?.race]}.png'\>` : ''}`
-										:``
+										: craftDataByName[craft]?.series ? craftDataByName[craft]?.series.map(
+											serie => {
+												return monster_data.filter(monster => {
+														return monster?.monsterTag.includes(serie)
+													}).map(monster => 
+													{
+														return `<img src='../tos_tool_data/img/monster/${monster.id}.png'\>`
+													}
+													).join('')
+												}
+										).join('')
+										: ``
 										
 									}
 								</td>
