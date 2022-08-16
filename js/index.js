@@ -143,10 +143,13 @@ function createData() {
 			craftDataByName[pureName].series = craft.series
 		}
 		
+		if(!craftDataByName[pureName]?.nameTag) {
+			craftDataByName[pureName].nameTag = craft.nameTag
+		}
+		
 		craftPureName.add(getPureName(craft.name))
 		craftDataByName[getPureName(craft.name)][craft.mode] = craft.id
 	})
-	console.log(craftDataByName)
 }
 
 function createTable() {
@@ -197,10 +200,19 @@ function createTable() {
 								${
 									craft_mode_type_string.map(type => {
 										const craftName = armed_craft_data.find(c => c.id === craftDataByName[craft][type])?.name
+										const craftNameTag = armed_craft_data.find(c => c.id === craftDataByName[craft][type])?.nameTag
 										const errorTypeId = craftTypeImg[craft_mode_type_string.findIndex(t => t === type)]
 										return craftDataByName?.[craft]?.[type] ? `
 											<td class="align-middle craft-td" id="craft-${craftDataByName[craft][type]}" onClick='onClickCraft(${craftDataByName[craft][type]})'>
 												${`<img title='${craftName}' alt='${craftDataByName[craft][type]}' src='../tos_tool_data/img/craft/${craftDataByName[craft][type]}.png' onerror='this.src="../tos_tool_data/img/craft/${errorTypeId}.png"' onClick='onClickCraft(${craftDataByName[craft][type]})'\>`}
+												${
+													craftNameTag?.length ? `
+														<div class="monsterId craftNameTag">
+															${craftNameTag}
+														</div>
+													` : ''
+												
+												}												
 												<div class="monsterId">
 													${paddingZeros(craftDataByName[craft][type], 3)}
 												</div>

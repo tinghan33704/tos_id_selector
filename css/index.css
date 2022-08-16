@@ -79,3 +79,8 @@ thead > tr {
 .data-textarea {
 	height: 200px !important;
 }
+
+.craftNameTag {
+    background-color: var(--button_secondary);
+    color: var(--text_monsterid_color);
+}
